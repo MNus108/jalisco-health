@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jalisco Health Care Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:wght@300;700;900&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              terra: {
+                50: '#fff8f6',
+                100: '#ffede8',
+                500: '#f97316', // Orange-500
+                600: '#ea580c',
+                900: '#7c2d12',
+              },
+              teal: {
+                800: '#115e59',
+                900: '#134e4a',
+              },
+              sand: '#f5f5f4',
+            },
+            fontFamily: {
+              sans: ['Lato', 'sans-serif'],
+              serif: ['Merriweather', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @media print {
+        /* Page Setup */
+        @page {
+          margin: 1cm 1.25cm;
+          size: auto;
+        }
+        
+        body {
+          background: white !important;
+          color: #1c1917 !important; /* stone-900 */
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          font-family: 'Calibri', 'Segoe UI', sans-serif !important;
+        }
+
+        /* Hide UI Elements */
+        .no-print, header, footer, button, .shadow-md, .action-bar, .action-bar * {
+          display: none !important;
+        }
+
+        /* Reset Containers */
+        main, #root, div {
+          width: 100% !important;
+          max-width: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          box-shadow: none !important;
+          border: none !important;
+          display: block !important;
+        }
+
+        /* Typography Enhancements for Print */
+        article {
+          font-size: 11pt !important;
+          line-height: 1.6 !important;
+        }
+
+        /* Main Title */
+        article h1 {
+          font-family: 'Merriweather', serif !important;
+          font-size: 24pt !important;
+          color: #134e4a !important; /* teal-900 */
+          font-weight: 900 !important;
+          margin-bottom: 0.5em !important;
+          border-bottom: 4px solid #ea580c !important; /* terra-600 */
+          padding-bottom: 15px !important;
+          text-transform: uppercase !important;
+          letter-spacing: 1px !important;
+        }
+
+        /* Section Headers - Report Style */
+        article h2 {
+          font-family: 'Merriweather', serif !important;
+          font-size: 15pt !important;
+          color: #115e59 !important; /* teal-800 */
+          font-weight: 700 !important;
+          margin-top: 1.8em !important;
+          margin-bottom: 0.8em !important;
+          padding: 8px 12px !important;
+          background-color: #f0fdfa !important; /* teal-50 */
+          border-left: 5px solid #0d9488 !important; /* teal-600 */
+          page-break-after: avoid;
+        }
+
+        /* Sub Headers */
+        article h3 {
+          font-family: 'Calibri', sans-serif !important;
+          font-size: 12pt !important;
+          color: #c2410c !important; /* terra-700 */
+          font-weight: 800 !important;
+          margin-top: 1.2em !important;
+          margin-bottom: 0.4em !important;
+          text-transform: uppercase !important;
+          page-break-after: avoid;
+        }
+
+        article strong {
+          color: #0f766e !important; /* teal-700 */
+          font-weight: 700 !important;
+        }
+
+        /* Lists */
+        article ul {
+          margin-left: 1.5em !important;
+          margin-bottom: 1em !important;
+        }
+
+        article li {
+          margin-bottom: 0.4em !important;
+          list-style-type: square !important;
+        }
+
+        /* Paragraphs */
+        article p {
+          margin-bottom: 1em !important;
+          text-align: justify;
+        }
+
+        /* Links */
+        article a {
+          color: #0f766e !important;
+          text-decoration: none !important;
+          border-bottom: 1px dotted #0f766e !important;
+        }
+        
+        /* Blockquotes / Callouts */
+        article blockquote {
+          border-left: 3px solid #fdba74 !important; /* terra-300 */
+          background-color: #fff7ed !important; /* orange-50 */
+          padding: 10px 15px !important;
+          margin: 15px 0 !important;
+          font-style: italic !important;
+        }
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.2",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+  }
+}
+</script>
+</head>
+  <body class="bg-stone-50 text-stone-800 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

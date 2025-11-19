@@ -1,0 +1,106 @@
+import React, { useState, useEffect } from 'react';
+import { Layout } from './components/Layout';
+import { WelcomeStep, BasicProfileStep, CurrentCoverageStep, HealthProfileStep, BudgetStep, CarePreferencesStep } from './components/StepWizard';
+import { ResultsView } from './components/ResultsView';
+import { Step, UserData, PersonData, INITIAL_DATA } from './types';
+import { generateBlueprint } from './services/geminiService';
+import { Loader2 } from 'lucide-react';
+
+const App: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState<Step>(Step.Welcome);
+  const [userData, setUserData] = useState<UserData>(INITIAL_DATA);
+  const [markdownResult, setMarkdownResult] = useState<string>('');
+
+  const updateData = (data: Partial<UserData>) => {
+    setUserData(prev => ({ ...prev, ...data }));
+  };
+
+  const updatePerson = (isPartner: boolean, data: Partial<PersonData>) => {
+    if (isPartner) {
+      setUserData(prev => ({
+        ...prev,
+        partnerUser: { ...(prev.partnerUser || { age: '', gender: '', citizenship: 'US', healthStatus: 'Good', conditions: '' }), ...data }
+      }));
+    } else {
+      setUserData(prev => ({
+        ...prev,
+        primaryUser: { ...prev.primaryUser, ...data }
+      }));
+    }
+  };
+
+  const handleNext = () => {
+    if (currentStep === Step.CarePreferences) {
+      generatePlan();
+    } else {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    setCurrentStep(prev => Math.max(0, prev - 1));
+  };
+
+  const generatePlan = async () => {
+    setCurrentStep(Step.Loading);
+    // Simulate a minimum load time for UX so they read the loading tip
+    const startTime = Date.now();
+    
+    const result = await generateBlueprint(userData);
+    
+    const elapsed = Date.now() - startTime;
+    const minTime = 2500;
+    
+    setTimeout(() => {
+      setMarkdownResult(result);
+      setCurrentStep(Step.Results);
+    }, Math.max(0, minTime - elapsed));
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case Step.Welcome:
+        return <WelcomeStep onStart={() => setCurrentStep(Step.BasicProfile)} />;
+      case Step.BasicProfile:
+        return <BasicProfileStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
+      case Step.CurrentCoverage:
+        return <CurrentCoverageStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
+      case Step.HealthProfile:
+        return <HealthProfileStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
+      case Step.Budget:
+        return <BudgetStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
+      case Step.CarePreferences:
+        return <CarePreferencesStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
+      case Step.Loading:
+        return (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-6 animate-pulse">
+             <Loader2 className="w-16 h-16 text-terra-500 animate-spin" />
+             <h2 className="text-2xl font-serif font-bold text-teal-900">Designing Your Blueprint...</h2>
+             <p className="max-w-md text-stone-500">
+               Did you know? Many private hospitals in Jalisco are JCI accredited and offer world-class care at a fraction of US prices.
+             </p>
+          </div>
+        );
+      case Step.Results:
+        return <ResultsView markdownContent={markdownResult} userData={userData} onReset={() => {
+          setUserData(INITIAL_DATA);
+          setCurrentStep(Step.Welcome);
+        }} />;
+      default:
+        return null;
+    }
+  };
+
+  // Scroll to top on step change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentStep]);
+
+  return (
+    <Layout step={currentStep} totalSteps={8}>
+      {renderStep()}
+    </Layout>
+  );
+};
+
+export default App;

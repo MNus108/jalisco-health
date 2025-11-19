@@ -1,0 +1,566 @@
+import React from 'react';
+import { UserData, Step, PersonData } from '../types';
+import { AlertTriangle, CheckCircle, ChevronRight, ChevronLeft, ThermometerSun, CreditCard, FileHeart, Plane, Globe } from 'lucide-react';
+
+interface StepProps {
+  userData: UserData;
+  updateData: (data: Partial<UserData>) => void;
+  updatePerson: (isPartner: boolean, data: Partial<PersonData>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+// --- Reusable Form Components ---
+const SectionTitle = ({ children }: { children?: React.ReactNode }) => (
+  <h2 className="text-2xl font-serif font-bold text-teal-900 mb-4">{children}</h2>
+);
+
+const Label = ({ children }: { children?: React.ReactNode }) => (
+  <label className="block text-sm font-bold text-stone-700 mb-1">{children}</label>
+);
+
+const Input = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { children?: React.ReactNode }) => (
+  <input 
+    {...props} 
+    className={`w-full p-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-terra-500 focus:border-terra-500 outline-none transition-all bg-white ${className || ''}`} 
+  />
+);
+
+const Select = (props: React.SelectHTMLAttributes<HTMLSelectElement> & { children?: React.ReactNode }) => (
+  <div className="relative">
+    <select {...props} className="w-full p-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-terra-500 outline-none bg-white appearance-none">
+      {props.children}
+    </select>
+    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-stone-500">
+      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+    </div>
+  </div>
+);
+
+const Button = ({ secondary, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { secondary?: boolean; children?: React.ReactNode }) => (
+  <button 
+    {...props} 
+    className={`px-6 py-3 rounded-full font-bold transition-colors flex items-center justify-center gap-2
+      ${secondary 
+        ? 'bg-stone-200 text-stone-700 hover:bg-stone-300' 
+        : 'bg-terra-600 text-white hover:bg-terra-700 shadow-lg shadow-terra-500/30'
+      }`}
+  />
+);
+
+// --- Steps ---
+
+export const WelcomeStep = ({ onStart }: { onStart: () => void }) => (
+  <div className="bg-white p-8 rounded-xl shadow-xl border-t-4 border-terra-500 text-center space-y-6">
+    <div className="flex justify-center">
+      <div className="bg-teal-50 p-4 rounded-full">
+        <ThermometerSun className="w-12 h-12 text-teal-800" />
+      </div>
+    </div>
+    <div>
+      <SectionTitle>Jalisco Health Care Plan</SectionTitle>
+      <p className="text-lg text-stone-600">
+        Living in Mexico is a dream, but healthcare surprises can be costly. 
+        Let's build a plan as solid as a good tortilla.
+      </p>
+    </div>
+    
+    <ul className="text-left max-w-md mx-auto space-y-3 bg-stone-50 p-6 rounded-lg border border-stone-200">
+      <li className="flex items-start gap-2">
+        <CheckCircle className="w-5 h-5 text-terra-500 mt-0.5 flex-shrink-0" />
+        <span>Top recommended strategy combinations with estimates.</span>
+      </li>
+      <li className="flex items-start gap-2">
+        <CheckCircle className="w-5 h-5 text-terra-500 mt-0.5 flex-shrink-0" />
+        <span>Personalized for your residency & travel habits.</span>
+      </li>
+      <li className="flex items-start gap-2">
+        <CheckCircle className="w-5 h-5 text-terra-500 mt-0.5 flex-shrink-0" />
+        <span>A downloadable Blueprint (.doc) for your files.</span>
+      </li>
+    </ul>
+
+    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-sm text-yellow-800 flex items-start gap-3 text-left">
+      <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+      <p>
+        <strong>Disclaimer:</strong> This tool is for educational purposes only. It is not medical, financial, tax, or legal advice. Always verify with professionals.
+      </p>
+    </div>
+
+    <Button onClick={onStart} className="w-full sm:w-auto mx-auto text-lg px-8">
+      I Understand, Let's Begin <ChevronRight className="w-5 h-5" />
+    </Button>
+  </div>
+);
+
+export const BasicProfileStep = ({ userData, updateData, updatePerson, onNext, onBack }: StepProps) => {
+  const isCouple = userData.planningFor === 'Couple';
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <SectionTitle>Step 1: Basic Profile</SectionTitle>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <Label>Who are you planning for?</Label>
+          <div className="flex gap-4 mt-2">
+            {['Self', 'Couple'].map((opt) => (
+              <button
+                key={opt}
+                onClick={() => updateData({ planningFor: opt as any })}
+                className={`flex-1 py-3 px-4 rounded-lg border-2 font-semibold transition-all ${userData.planningFor === opt ? 'border-terra-500 bg-terra-50 text-terra-900' : 'border-stone-200 text-stone-500 hover:border-stone-300'}`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Label>Preferred Currency</Label>
+          <Select 
+            value={userData.currency} 
+            onChange={(e) => updateData({ currency: e.target.value as any })}
+          >
+            <option value="USD">USD ($)</option>
+            <option value="CAD">CAD ($)</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-sm border border-stone-200 space-y-4">
+        <h3 className="font-bold text-lg text-teal-900">Primary Person</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label>Age</Label>
+            <Input type="number" value={userData.primaryUser.age} onChange={(e) => updatePerson(false, { age: e.target.value })} placeholder="e.g. 65" />
+          </div>
+          <div>
+            <Label>Citizenship</Label>
+            <Select value={userData.primaryUser.citizenship} onChange={(e) => updatePerson(false, { citizenship: e.target.value as any })}>
+              <option value="US">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="Dual">Dual US/Canada</option>
+              <option value="Other">Other</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Primary Residence</Label>
+            <Select value={userData.residence} onChange={(e) => updateData({ residence: e.target.value as any })}>
+              <option value="US">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="Other">Other</option>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {isCouple && (
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-stone-200 space-y-4">
+          <h3 className="font-bold text-lg text-teal-900">Partner / Spouse</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Age</Label>
+              <Input type="number" value={userData.partnerUser?.age || ''} onChange={(e) => updatePerson(true, { age: e.target.value })} placeholder="e.g. 62" />
+            </div>
+            <div>
+              <Label>Citizenship</Label>
+              <Select value={userData.partnerUser?.citizenship || 'US'} onChange={(e) => updatePerson(true, { citizenship: e.target.value as any })}>
+                <option value="US">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="Dual">Dual US/Canada</option>
+                <option value="Other">Other</option>
+              </Select>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+           <div>
+            <Label>Time in Mexico (Per Year)</Label>
+            <Select value={userData.timeInMexico} onChange={(e) => updateData({ timeInMexico: e.target.value as any })}>
+              <option value="1-3 months">1-3 months (Snowbird)</option>
+              <option value="3-6 months">3-6 months</option>
+              <option value="6-9 months">6-9 months</option>
+              <option value="9-12 months">9-12 months (Full time)</option>
+            </Select>
+           </div>
+           <div>
+             <div className="flex items-center gap-2 mb-1">
+               <Plane className="w-4 h-4 text-terra-500" />
+               <Label>Return trips to Home Country</Label>
+             </div>
+            <Select value={userData.returnTripFrequency} onChange={(e) => updateData({ returnTripFrequency: e.target.value as any })}>
+              <option value="Rarely">Rarely (Once a year or less)</option>
+              <option value="1-2 times/year">1-2 times per year</option>
+              <option value="Monthly/Frequent">Frequently (Monthly/Quarterly)</option>
+            </Select>
+            <p className="text-xs text-stone-500 mt-1">Helps determine if you can rely on home coverage.</p>
+           </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label>Location in Jalisco</Label>
+            <Input 
+              value={userData.location} 
+              onChange={(e) => updateData({ location: e.target.value })} 
+              placeholder="e.g. Ajijic, Puerto Vallarta" 
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+               <Globe className="w-4 h-4 text-terra-500" />
+               <Label>Immigration Status in Mexico</Label>
+            </div>
+            <Select value={userData.immigrationStatus} onChange={(e) => updateData({ immigrationStatus: e.target.value as any })}>
+              <option value="Tourist">Tourist / Visitor (FMM)</option>
+              <option value="Temporary Resident">Temporary Resident (Residente Temporal)</option>
+              <option value="Permanent Resident">Permanent Resident (Residente Permanente)</option>
+              <option value="Citizen">Mexican Citizen / Naturalized</option>
+            </Select>
+            <p className="text-xs text-stone-500 mt-1">Required for eligibility in public plans like Seguro Salud Jalisco.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end pt-4">
+        <Button onClick={onNext}>Next Step <ChevronRight className="w-4 h-4" /></Button>
+      </div>
+    </div>
+  );
+};
+
+export const CurrentCoverageStep = ({ userData, updateData, onNext, onBack }: StepProps) => {
+  const getHomeOptions = () => {
+    const base = ['Employer/Retiree Plan', 'Private Individual Insurance', 'Travel Medical Insurance', 'None'];
+    const usOptions = ['Medicare A & B', 'Medigap (Supplement)', 'Medicare Advantage'];
+    const caOptions = ['Provincial Coverage', 'Extended Health Benefits (Canada)'];
+
+    if (userData.residence === 'Canada') {
+      // Prioritize Canada options, but allow US ones (e.g. US citizen resident in Canada)
+      return [...caOptions, ...usOptions, ...base];
+    }
+    // Default / US Residence
+    return [...usOptions, ...caOptions, ...base];
+  };
+
+  const homeOptions = getHomeOptions();
+
+  const toggleHome = (opt: string) => {
+    const current = userData.homeCoverage;
+    updateData({ 
+      homeCoverage: current.includes(opt) ? current.filter(i => i !== opt) : [...current, opt] 
+    });
+  };
+
+  const toggleMex = (opt: string) => {
+    const current = userData.mexicoCoverage;
+    updateData({ 
+      mexicoCoverage: current.includes(opt) ? current.filter(i => i !== opt) : [...current, opt] 
+    });
+  };
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <SectionTitle>Step 2: Current Coverage</SectionTitle>
+      
+      <div className="bg-white p-6 rounded-xl border border-stone-200">
+        <Label>Home Country Coverage (Residence: {userData.residence})</Label>
+        <p className="text-sm text-stone-500 mb-3">Select all that apply to you or your partner.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {homeOptions.map(opt => (
+            <label key={opt} className="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-stone-50">
+              <input 
+                type="checkbox" 
+                checked={userData.homeCoverage.includes(opt)}
+                onChange={() => toggleHome(opt)}
+                className="w-5 h-5 mt-0.5 text-terra-600 rounded focus:ring-terra-500 flex-shrink-0"
+              />
+              <span className="text-stone-700 text-sm">{opt}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-stone-200">
+        <Label>Current Mexico Coverage</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+          {[
+            'Seguro Salud Jalisco (State Plan)', 
+            'IMSS (Public Social Security)', 
+            'Mexican Private Insurance', 
+            'International Expat Insurance', 
+            'Travel Insurance', 
+            'Pay out-of-pocket'
+          ].map(opt => (
+            <label key={opt} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-stone-50">
+              <input 
+                type="checkbox" 
+                checked={userData.mexicoCoverage.includes(opt)}
+                onChange={() => toggleMex(opt)}
+                className="w-5 h-5 text-terra-600 rounded focus:ring-terra-500 flex-shrink-0"
+              />
+              <span className="text-stone-700 text-sm">{opt}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <Label>Experience using medical services in Mexico?</Label>
+        <textarea 
+          className="w-full p-3 border border-stone-300 rounded-lg h-24 bg-white"
+          placeholder="Briefly describe how you've paid in the past (optional)..."
+          value={userData.mexicoHistory}
+          onChange={(e) => updateData({ mexicoHistory: e.target.value })}
+        />
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button secondary onClick={onBack}><ChevronLeft className="w-4 h-4" /> Back</Button>
+        <Button onClick={onNext}>Next Step <ChevronRight className="w-4 h-4" /></Button>
+      </div>
+    </div>
+  );
+};
+
+export const HealthProfileStep = ({ userData, updateData, updatePerson, onNext, onBack }: StepProps) => {
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <SectionTitle>Step 3: Health & Risk</SectionTitle>
+
+      <div className="bg-white p-6 rounded-xl border border-stone-200">
+        <div className="flex items-center gap-2 mb-4">
+          <FileHeart className="text-terra-500" />
+          <h3 className="font-bold text-lg text-teal-900">Health Status</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label>Primary User Health</Label>
+            <div className="flex flex-col gap-2 mt-2">
+              {['Excellent', 'Good', 'Fair', 'Poor'].map((s) => (
+                <label key={s} className="flex items-center gap-2">
+                  <input 
+                    type="radio" 
+                    name="p-health"
+                    checked={userData.primaryUser.healthStatus === s}
+                    onChange={() => updatePerson(false, { healthStatus: s as any })}
+                    className="text-terra-600 focus:ring-terra-500"
+                  />
+                  <span>{s}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          
+          {userData.planningFor === 'Couple' && userData.partnerUser && (
+             <div>
+             <Label>Partner Health</Label>
+             <div className="flex flex-col gap-2 mt-2">
+               {['Excellent', 'Good', 'Fair', 'Poor'].map((s) => (
+                 <label key={s} className="flex items-center gap-2">
+                   <input 
+                     type="radio" 
+                     name="part-health"
+                     checked={userData.partnerUser!.healthStatus === s}
+                     onChange={() => updatePerson(true, { healthStatus: s as any })}
+                     className="text-terra-600 focus:ring-terra-500"
+                   />
+                   <span>{s}</span>
+                 </label>
+               ))}
+             </div>
+           </div>
+          )}
+        </div>
+
+        <div className="mt-4">
+          <Label>Notable Conditions (Optional)</Label>
+          <p className="text-xs text-stone-500 mb-2">Do not share sensitive ID info. Just general conditions like "Diabetes", "Hypertension".</p>
+          <Input 
+            placeholder="e.g. Type 2 Diabetes, controlled" 
+            value={userData.primaryUser.conditions}
+            onChange={(e) => updatePerson(false, { conditions: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="bg-teal-50 p-6 rounded-xl border border-teal-100">
+        <Label>Risk Tolerance (Financial)</Label>
+        <p className="text-sm text-stone-600 mb-3">How do you feel about unexpected medical bills?</p>
+        <div className="space-y-3">
+          {[
+            { val: 'Low', desc: 'I prefer paying monthly premiums to avoid big surprise bills.' },
+            { val: 'Moderate', desc: 'I can handle some costs, but want protection for big disasters.' },
+            { val: 'High', desc: 'I prefer to self-insure and pay bills as they come.' }
+          ].map((opt) => (
+            <label key={opt.val} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${userData.riskTolerance === opt.val ? 'bg-white border-terra-500 shadow-sm' : 'border-transparent hover:bg-white/50'}`}>
+              <input 
+                type="radio" 
+                name="risk"
+                checked={userData.riskTolerance === opt.val}
+                onChange={() => updateData({ riskTolerance: opt.val as any })}
+                className="mt-1 text-terra-600 focus:ring-terra-500"
+              />
+              <div>
+                <span className="font-bold text-teal-900">{opt.val}</span>
+                <p className="text-sm text-stone-600">{opt.desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button secondary onClick={onBack}><ChevronLeft className="w-4 h-4" /> Back</Button>
+        <Button onClick={onNext}>Next Step <ChevronRight className="w-4 h-4" /></Button>
+      </div>
+    </div>
+  );
+};
+
+export const BudgetStep = ({ userData, updateData, onNext, onBack }: StepProps) => {
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <SectionTitle>Step 4: Budget & Capacity</SectionTitle>
+
+      <div className="bg-white p-8 rounded-xl border border-stone-200 shadow-sm text-center">
+        <div className="inline-block p-3 bg-green-100 rounded-full mb-4">
+          <CreditCard className="w-8 h-8 text-green-700" />
+        </div>
+        <Label>Monthly Health Budget ({userData.currency})</Label>
+        <p className="text-stone-500 mb-4 text-sm">Specifically for Mexico-related health costs (insurance + savings).</p>
+        
+        <div className="max-w-xs mx-auto">
+          <div className="relative">
+            <span className="absolute left-3 top-3 text-stone-400 font-bold">$</span>
+            <Input 
+              type="number" 
+              className="pl-14 text-lg font-mono"
+              placeholder="e.g. 500"
+              value={userData.monthlyBudget}
+              onChange={(e) => updateData({ monthlyBudget: e.target.value })}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="bg-white p-6 rounded-lg border border-stone-200">
+           <Label>Emergency Funding Source (Immediate Access)</Label>
+           <p className="text-xs text-stone-500 mb-3">For hospital deposits/emergencies (approx $10k+ USD).</p>
+           <div className="space-y-2">
+              <label className="flex items-center gap-3 p-2 hover:bg-stone-50 rounded cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="emergencyFund"
+                  checked={userData.emergencyFundSource === 'Cash'}
+                  onChange={() => updateData({ emergencyFundSource: 'Cash' })}
+                  className="text-terra-600 focus:ring-terra-500"
+                />
+                <span className="text-stone-800">Cash / Liquid Savings</span>
+              </label>
+              <label className="flex items-center gap-3 p-2 hover:bg-stone-50 rounded cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="emergencyFund"
+                  checked={userData.emergencyFundSource === 'Credit'}
+                  onChange={() => updateData({ emergencyFundSource: 'Credit' })}
+                  className="text-terra-600 focus:ring-terra-500"
+                />
+                <span className="text-stone-800">Credit Card with $10,000 USD or more credit</span>
+              </label>
+              <label className="flex items-center gap-3 p-2 hover:bg-stone-50 rounded cursor-pointer">
+                <input 
+                  type="radio" 
+                  name="emergencyFund"
+                  checked={userData.emergencyFundSource === 'None'}
+                  onChange={() => updateData({ emergencyFundSource: 'None' })}
+                  className="text-terra-600 focus:ring-terra-500"
+                />
+                <span className="text-stone-800">None / Building it</span>
+              </label>
+           </div>
+        </div>
+
+        <div>
+          <Label>Funding Preference</Label>
+          <Select 
+            value={userData.fundingPreference} 
+            onChange={(e) => updateData({ fundingPreference: e.target.value as any })}
+          >
+            <option value="High Premium">Pay more monthly, lower deductible (Peace of Mind)</option>
+            <option value="Moderate">Balanced Approach</option>
+            <option value="Low Premium/Self-Fund">Minimize monthly costs, I'll pay for care (Riskier)</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button secondary onClick={onBack}><ChevronLeft className="w-4 h-4" /> Back</Button>
+        <Button onClick={onNext}>Next Step <ChevronRight className="w-4 h-4" /></Button>
+      </div>
+    </div>
+  );
+};
+
+export const CarePreferencesStep = ({ userData, updateData, onNext, onBack }: StepProps) => {
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <SectionTitle>Step 5: Care Preferences</SectionTitle>
+      
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-white p-5 rounded-xl border border-stone-200">
+          <Label>For major medical issues (cancer, major surgery), I would prefer:</Label>
+          <div className="mt-3 space-y-2">
+            {['Mexico', 'Home Country', 'Mixed'].map(opt => (
+               <label key={opt} className="flex items-center gap-3 p-2 rounded hover:bg-stone-50 cursor-pointer">
+                 <input 
+                   type="radio" 
+                   name="major-care"
+                   checked={userData.majorCarePreference === opt}
+                   onChange={() => updateData({ majorCarePreference: opt as any })}
+                   className="text-terra-600 focus:ring-terra-500"
+                 />
+                 <span className="text-stone-800">{opt === 'Mixed' ? 'Mixed (Minor here, Major home)' : `Treatment in ${opt}`}</span>
+               </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-xl border border-stone-200">
+          <Label>Spanish Language Comfort (Medical Setting)</Label>
+          <div className="flex gap-2 mt-3">
+             {['Low', 'Medium', 'High'].map(lvl => (
+               <button
+                key={lvl}
+                onClick={() => updateData({ spanishComfort: lvl as any })}
+                className={`flex-1 py-2 rounded border font-medium transition-colors ${userData.spanishComfort === lvl ? 'bg-teal-50 border-teal-500 text-teal-900' : 'bg-white border-stone-300 text-stone-500'}`}
+               >
+                 {lvl}
+               </button>
+             ))}
+          </div>
+        </div>
+
+        <div>
+          <Label>Provider Preference in Mexico</Label>
+          <Select value={userData.providerPreference} onChange={(e) => updateData({ providerPreference: e.target.value as any })}>
+            <option value="Private">Private Hospitals/Clinics (Faster, English common)</option>
+            <option value="Public">Public System (IMSS/INSABI - Low cost, slower)</option>
+            <option value="Not Sure">I need advice on this</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button secondary onClick={onBack}><ChevronLeft className="w-4 h-4" /> Back</Button>
+        <Button onClick={onNext}>Generate Blueprint <CheckCircle className="w-4 h-4 ml-2" /></Button>
+      </div>
+    </div>
+  );
+};
