@@ -10,6 +10,7 @@ const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<Step>(Step.Welcome);
   const [userData, setUserData] = useState<UserData>(INITIAL_DATA);
   const [markdownResult, setMarkdownResult] = useState<string>('');
+  const [loadingMessage, setLoadingMessage] = useState("Analyzing your profile...");
 
   const updateData = (data: Partial<UserData>) => {
     setUserData(prev => ({ ...prev, ...data }));
@@ -43,18 +44,41 @@ const App: React.FC = () => {
 
   const generatePlan = async () => {
     setCurrentStep(Step.Loading);
-    // Simulate a minimum load time for UX so they read the loading tip
+    
+    // Start the "Thinking" message cycle
+    const messages = [
+      "Analyzing your profile...",
+      "Checking Seguro Salud Jalisco eligibility...",
+      "Comparing private insurance options...",
+      "Drafting your personalized blueprint..."
+    ];
+    
+    let msgIndex = 0;
+    const msgInterval = setInterval(() => {
+      msgIndex = (msgIndex + 1) % messages.length;
+      setLoadingMessage(messages[msgIndex]);
+    }, 1500);
+
     const startTime = Date.now();
     
-    const result = await generateBlueprint(userData);
-    
-    const elapsed = Date.now() - startTime;
-    const minTime = 2500;
-    
-    setTimeout(() => {
-      setMarkdownResult(result);
+    try {
+      const result = await generateBlueprint(userData);
+      
+      // Ensure we show the loading state for at least a few seconds for UX
+      const elapsed = Date.now() - startTime;
+      const minTime = 3000;
+      
+      setTimeout(() => {
+        clearInterval(msgInterval);
+        setMarkdownResult(result);
+        setCurrentStep(Step.Results);
+      }, Math.max(0, minTime - elapsed));
+      
+    } catch (e) {
+      clearInterval(msgInterval);
+      setMarkdownResult("## Error\n\nSomething went wrong. Please try again.");
       setCurrentStep(Step.Results);
-    }, Math.max(0, minTime - elapsed));
+    }
   };
 
   const renderStep = () => {
@@ -73,12 +97,20 @@ const App: React.FC = () => {
         return <CarePreferencesStep userData={userData} updateData={updateData} updatePerson={updatePerson} onNext={handleNext} onBack={handleBack} />;
       case Step.Loading:
         return (
-          <div className="flex flex-col items-center justify-center py-20 text-center space-y-6 animate-pulse">
-             <Loader2 className="w-16 h-16 text-terra-500 animate-spin" />
-             <h2 className="text-2xl font-serif font-bold text-teal-900">Designing Your Blueprint...</h2>
-             <p className="max-w-md text-stone-500">
-               Did you know? Many private hospitals in Jalisco are JCI accredited and offer world-class care at a fraction of US prices.
-             </p>
+          <div className="flex flex-col items-center justify-center py-24 text-center space-y-8 animate-fade-in">
+             <div className="relative">
+               <div className="absolute inset-0 bg-terra-200 rounded-full animate-ping opacity-25"></div>
+               <Loader2 className="w-16 h-16 text-terra-600 animate-spin relative z-10" />
+             </div>
+             
+             <div className="space-y-2">
+               <h2 className="text-2xl font-serif font-bold text-teal-900 transition-all duration-500">
+                 {loadingMessage}
+               </h2>
+               <p className="max-w-md text-stone-500 mx-auto text-sm">
+                 Did you know? Many private hospitals in Jalisco are JCI accredited and offer world-class care at a fraction of US prices.
+               </p>
+             </div>
           </div>
         );
       case Step.Results:
