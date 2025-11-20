@@ -1,15 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { UserData } from "../types";
 
-// Declare process to fix TypeScript errors without needing @ts-nocheck
-declare const process: {
-  env: {
-    API_KEY: string;
-  }
-};
-
 // Initialize Gemini Client
 // API Key is injected by the environment
+// process is typed via @types/node in tsconfig.json
 const apiKey = process.env.API_KEY;
 const ai = new GoogleGenAI({ apiKey });
 
