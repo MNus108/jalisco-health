@@ -1,11 +1,16 @@
-// @ts-nocheck
 import { GoogleGenAI } from "@google/genai";
 import { UserData } from "../types";
 
+// Declare process to fix TypeScript errors without needing @ts-nocheck
+declare const process: {
+  env: {
+    API_KEY: string;
+  }
+};
+
 // Initialize Gemini Client
 // API Key is injected by the environment
-// We explicitly cast to string to avoid TypeScript build errors about undefined types
-const apiKey = process.env.API_KEY as string;
+const apiKey = process.env.API_KEY;
 const ai = new GoogleGenAI({ apiKey });
 
 export const generateBlueprint = async (userData: UserData): Promise<string> => {
