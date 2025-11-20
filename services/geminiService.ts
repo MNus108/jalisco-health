@@ -3,7 +3,7 @@ import { UserData } from "../types";
 
 // Initialize Gemini Client
 // API Key is injected by the environment
-// process is typed via @types/node in tsconfig.json
+// @ts-ignore
 const apiKey = process.env.API_KEY;
 const ai = new GoogleGenAI({ apiKey });
 
