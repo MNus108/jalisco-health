@@ -3,7 +3,8 @@ import { UserData } from "../types";
 
 // Initialize Gemini Client
 // API Key is injected by the environment
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// We explicitly cast to string to avoid TypeScript build errors about undefined types
+const ai = new GoogleGenAI({ apiKey: (process.env.API_KEY as string) });
 
 export const generateBlueprint = async (userData: UserData): Promise<string> => {
   const model = "gemini-2.5-flash";
