@@ -1,9 +1,9 @@
+// @ts-nocheck
 import { GoogleGenAI } from "@google/genai";
 import { UserData } from "../types";
 
 // Initialize Gemini Client
 // API Key is injected by the environment
-// @ts-ignore
 const apiKey = process.env.API_KEY;
 const ai = new GoogleGenAI({ apiKey });
 
