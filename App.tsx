@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from './components/Layout';
+// Explicitly using .tsx extension to resolve build casing issues
+import { Layout } from './components/Layout.tsx';
 import { WelcomeStep, BasicProfileStep, CurrentCoverageStep, HealthProfileStep, BudgetStep, CarePreferencesStep } from './components/StepWizard';
 import { ResultsView } from './components/ResultsView';
 import { Step, UserData, PersonData, INITIAL_DATA } from './types';
